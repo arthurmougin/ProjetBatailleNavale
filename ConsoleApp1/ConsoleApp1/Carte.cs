@@ -8,7 +8,7 @@ namespace ConsoleApp1
     {
         
         /// <summary>
-        /// w:vide, H:bateau vivant, v:raté, X:touché, O:coulé
+        /// -:vide, H:bateau vivant, v:raté, X:touché, O:coulé
         /// </summary>
         private char[,] matrice;
         public char[,] Matrice
@@ -31,7 +31,7 @@ namespace ConsoleApp1
             {
                 for (int j = 0; j < 10; j++)
                 {
-                    Matrice[i, j] = 'w';
+                    Matrice[i, j] = '-';
                 }
             }
             Bateaux = new List<Bateau>();
@@ -44,7 +44,7 @@ namespace ConsoleApp1
             {
                 for (int j = 0; j < taille; j++)
                 {
-                    Matrice[i, j] = 'w';
+                    Matrice[i, j] = '-';
                 }
             }
             Bateaux = new List<Bateau>();
@@ -54,36 +54,37 @@ namespace ConsoleApp1
         {
             int matriceTaille = matrice.GetLength(0);
 
-           
             if (b.Horizontal)
             {
                 //Si le bateau ne sors pas de la map
-                if (b.X + b.Taille > (matriceTaille - 1))
-                    return false;
-
-                //si son espace n'est pas occupé
-                for (uint i = b.X; i < (b.X + b.Taille); i++)
-                {
-                    if(matrice[i,b.Y] != 'w')
-                        return false;
-                }
-
-                //alors on le dessine
-                for (uint i = b.X; i < (b.X + b.Taille); i++)
-                {
-                    matrice[i, b.Y] = 'H';
-                }
-            }
-            else
-            {
-                //Si le bateau ne sors pas de la map
-                if (b.Y + b.Taille > (matriceTaille - 1))
+                if (b.Y + b.Taille-1 > (matriceTaille - 1))
                     return false;
 
                 //si son espace n'est pas occupé
                 for (uint i = b.Y; i < (b.Y + b.Taille); i++)
                 {
-                    if (matrice[b.X, i] != 'w')
+                    if (matrice[b.X, i] != '-')
+                        return false;
+                }
+
+                //alors on le dessine
+                for (uint i = b.Y; i < (b.Y + b.Taille); i++)
+                {
+                    matrice[b.X, i] = 'H';
+                }
+
+            }
+            else
+            {
+                //Si le bateau ne sors pas de la map
+                if (b.X + b.Taille-1 > (matriceTaille - 1))
+                    return false;
+
+
+                //si son espace n'est pas occupé
+                for (uint i = b.X; i < (b.X + b.Taille); i++)
+                {
+                    if (matrice[i, b.Y] != '-')
                         return false;
                 }
 
@@ -121,17 +122,17 @@ namespace ConsoleApp1
             for (int i = 0; i < matriceTaille; i++)
             {
                 //repère gauche
-                marker = matriceTaille - i;
+                marker = i + 1;
                 retour += (marker < 10)?(marker + "  "): marker.ToString()+" ";
                 //contenu
                 for (int j = 0; j < matriceTaille; j++)
                 {
                     //Si on est caché et que la case est un bateau vierge, alors on affiche de l'eau
-                    retour += (caché)? ((Matrice[i, j] == 'H') ? "w ": Matrice[i, j] + " ") : Matrice[i, j]+" ";
+                    retour += (caché)? ((Matrice[i, j] == 'H') ? '-'+" ": Matrice[i, j] + " ") : Matrice[i, j]+" ";
                 }
                 retour += "\n";
             }
-
+            retour += "\nBateaux:" + bateaux.Count+"\n";
 
             return retour;
         }
@@ -145,6 +146,52 @@ namespace ConsoleApp1
             
         }
 
-        
+        public string GetDoc()
+        {
+            return "'-':vide, 'H':bateau, 'v':raté, 'X':touché, 'O':coulé\n\n\n";
+        }
+        public void Reset()
+        {
+            bateaux.Clear();
+            int taille = Matrice.GetLength(0);
+            for (int i = 0; i < taille; i++)
+            {
+                for (int j = 0; j < taille; j++)
+                {
+                    Matrice[i, j] = '-';
+                }
+            }
+        }
+        public Bateau GetBateauByCoords(int x, int y)
+        {
+            if(Matrice[x,y] == '-' || Matrice[x, y] == 'v')
+                return null;
+
+            //On teste pour chaque bateaux s'ils possèdent cette case
+            for (int i = 0; i < bateaux.Count; i++)
+            {
+                if (bateaux[i].X == x && bateaux[i].Y == y) return bateaux[i];
+
+                if (bateaux[i].Horizontal)
+                {
+                    if(bateaux[i].X == x && (x - bateaux[i].X <= bateaux[i].Taille)) return bateaux[i];
+                }
+                else
+                {
+                    if (bateaux[i].Y == y && (y - bateaux[i].Y <= bateaux[i].Taille)) return bateaux[i];
+                }
+            }
+            return null;
+        }
+
+        public bool EstFinie()
+        {
+            int viesRestantes = 0;
+            for (int i = 0; i < bateaux.Count; i++)
+            {
+                viesRestantes += bateaux[i].Vies;
+            }
+            return viesRestantes == 0;
+        }
     }
 }

@@ -11,6 +11,7 @@ namespace ConsoleApp1
         public int Taille
         {
             get { return taille; }
+            set { taille = value; }
         }
 
         /// <summary>
@@ -20,15 +21,17 @@ namespace ConsoleApp1
         public uint X
         {
             get { return x; }
+            set { x = value; }
         }
 
         /// <summary>
-        /// Point en bas du bateau
+        /// Point en haut du bateau
         /// </summary>
         private uint y;
         public uint Y
         {
             get { return y; }
+            set { y = value; }
         }
 
         /// <summary>
@@ -38,6 +41,7 @@ namespace ConsoleApp1
         public bool Horizontal
         {
             get { return horizontal; }
+            set { horizontal = value; }
         }
 
         /// <summary>
@@ -71,6 +75,11 @@ namespace ConsoleApp1
         public bool isAlive()
         {
             return vies > 0;
+        }
+
+        public override string ToString()
+        {
+            return "Bateau positionné en " + (x+1) + "-" + (char)(y + 96 +1)+ ", de longueur "+ taille + " et "+((horizontal)?"horizontal":"vertical");
         }
     }
 }
