@@ -153,6 +153,12 @@ namespace ConsoleApp1
         {
             return (tour % 2 == 0) ? map2 : map1;
         }
+       
+        private Carte GetMapEnemyByTurn()
+        {
+            return (tour % 2 == 0) ? map1 : map2;
+        }
+        
 
         private string AskUser(string content)
         {
@@ -178,24 +184,27 @@ namespace ConsoleApp1
                     string[] array = input.Split('-', StringSplitOptions.None);
                     int x = 0,y = 0;
 
-
-                    //test de la première valeur
-                    if (Int32.TryParse(array[0], out x))
+                    if(array.Length >= 2)
                     {
-                        x--;
-
-                        if (x < m.Matrice.GetLength(0))
+                        //test de la première valeur
+                        if (Int32.TryParse(array[0], out x))
                         {
-                            //test de la seconde valeur
-                            y = ((int)array[1].ToCharArray()[0]) - 97;
-                            if (y >= 0 && y < m.Matrice.GetLength(0))
+                            x--;
+
+                            if (x < m.Matrice.GetLength(0))
                             {
-                                valideInput = true;
-                                b.X = (uint)x;
-                                b.Y = (uint)y;
+                                //test de la seconde valeur
+                                y = ((int)array[1].ToCharArray()[0]) - 97;
+                                if (y >= 0 && y < m.Matrice.GetLength(0))
+                                {
+                                    valideInput = true;
+                                    b.X = (uint)x;
+                                    b.Y = (uint)y;
+                                }
                             }
                         }
                     }
+                    
                     if (valideInput == false)
                     {
                         resetView();
@@ -288,6 +297,77 @@ namespace ConsoleApp1
             Console.WriteLine(DrawMaps());
         }
 
+        public int Tirer()
+        {
+            bool ValideFire = false, valideInput = false, exit = false;
+            string input = "";
+            int retour = 0;
+            int x = 0, y = 0,resultat = 0;
+            do
+            {
+                resetView();
+                Console.WriteLine(@"Tir:");
+
+                //GetInput
+                do
+                {
+                    valideInput = false;
+                    input = AskUser("Quelles sont les coordonnées de votre tir?\n(format: '1-a')");
+                    string[] array = input.Split('-', StringSplitOptions.None);
+                    
+                    if(array.Length >= 2)
+                    {
+                        //test de la première valeur
+                        if (Int32.TryParse(array[0], out x))
+                        {
+                            x--;
+
+                            if (x < GetMapEnemyByTurn().Matrice.GetLength(0))
+                            {
+                                //test de la seconde valeur
+                                y = ((int)array[1].ToCharArray()[0]) - 97;
+                                if (y >= 0 && y < GetMapEnemyByTurn().Matrice.GetLength(0))
+                                {
+                                    valideInput = true;
+                                }
+                            }
+                        }
+                        
+                    }
+
+                    if (valideInput == false)
+                    {
+                        AskUser("Valeur invalide (" + x + "-" + y + "), recommencez.");
+                    }
+                } while (!valideInput);
+
+                resultat = GetMapEnemyByTurn().Tirer(x, y);
+                exit = true;
+                switch (resultat)
+                {
+                    case 0:
+                        AskUser("Plouf dans l'eau");
+                        break;
+                    case 1:
+                        AskUser("Déjà tiré ici, recommenez.");
+                        exit = false;
+                        break;
+                    case 2:
+                        AskUser("Touché");
+                        retour = 1;
+                        break;
+                    case 3:
+                        AskUser("Couler");
+                        retour = 1;
+                        break;
+                    default:
+                        break;
+                }
+
+            } while (!exit);
+            return retour;
+        }
+
         public void Jeu()
         {
 
@@ -347,15 +427,26 @@ namespace ConsoleApp1
                 do //Main Action loop
                 {
                     NextTurn();
+                    int tirRestant = 1;
                     do // action Loop
                     {
+                        
                         resetView();
                         valideInput = false;
                         input = AskUser(PrintInputs(1));
+                        if (input == "1")
+                        {
+                            tirRestant = Tirer();
+                            valideInput = true;
+                        }
+                        if (input == "2")
+                        {
+                            valideInput = true;
+                        }
 
-
-                    } while (input != "3" || valideInput == false);
-
+                        if (valideInput == false)
+                            AskUser("Input inconnue, recommencez");
+                    } while (tirRestant != 0 || valideInput == false);
                 } while (!Map1.EstFinie() && !Map2.EstFinie());
 
 
@@ -378,14 +469,11 @@ namespace ConsoleApp1
                     }
 
                     if (valideInput == false)
-                        Console.WriteLine("Input inconnue, recommencez");
+                        AskUser("Input inconnue, recommencez");
                 } while ( valideInput == false);
 
             } while (state != 2);
             
-
-
-
             /**/
         }
 

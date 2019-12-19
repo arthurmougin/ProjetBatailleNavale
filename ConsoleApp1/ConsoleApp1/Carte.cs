@@ -193,5 +193,56 @@ namespace ConsoleApp1
             }
             return viesRestantes == 0;
         }
+
+        private void BateauCoulé(Bateau b)
+        {
+            if (b.Horizontal)
+            {
+                //alors on le dessine
+                for (uint i = b.Y; i < (b.Y + b.Taille); i++)
+                {
+                    matrice[b.X, i] = 'O';
+                }
+
+            }
+            else
+            {
+                //alors on le dessine
+                for (uint i = b.X; i < (b.X + b.Taille); i++)
+                {
+                    matrice[i, b.Y] = 'O';
+                }
+            }
+        }
+
+        public int Tirer(int x,int y)
+        {
+            int retour = 0;//0:raté, 1:déjàtiré, 2:touché, 3:couler
+            char maCase = matrice[x, y];
+            if(maCase == '-')//tir dans l'eau
+            {
+                retour = 0;
+                matrice[x, y] = 'v';
+            }
+            else if (maCase == 'v' || maCase == 'X' || maCase == 'O')//tir déjà effectué
+            {
+                retour = 1;
+            }
+            if (maCase == 'H')//tir sur bateau
+            {
+                retour = 2;
+                matrice[x, y] = 'X';
+
+                Bateau b = GetBateauByCoords(x, y);
+                b.Vies--;
+                if(b.Vies == 0)
+                {
+                    retour = 3;
+                    BateauCoulé(b);
+                }
+            }
+
+            return retour;
+        }
     }
 }
