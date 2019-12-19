@@ -358,7 +358,7 @@ namespace ConsoleApp1
                         break;
                     case 3:
                         AskUser("Couler");
-                        retour = 1;
+                        retour = (GetMapEnemyByTurn().EstFinie())?0:1;
                         break;
                     default:
                         break;
@@ -368,6 +368,18 @@ namespace ConsoleApp1
             return retour;
         }
 
+        public void JeuCommence()
+        {
+            Console.Clear();
+            AskUser("\n\n\nLes jeux commencent !");
+        }
+
+        public void Victoire()
+        {
+            Console.Clear();
+            AskUser("\n\n\nLe joueur " + (map1.EstFinie()?"2":"1") + " a gagné!");
+        }
+
         public void Jeu()
         {
 
@@ -375,12 +387,13 @@ namespace ConsoleApp1
             
             string input = "";
             bool valideInput = false;
+            int setupcount, tirRestant;
 
-            
+
 
             do //GameLoop
             {
-                int setupcount = 0;
+                setupcount = 0;
                 do //setupLoop
                 {
                     NextTurn();
@@ -389,6 +402,8 @@ namespace ConsoleApp1
                         resetView();
                         valideInput = false;
                         input = AskUser(PrintInputs(0));
+                        
+
                         if (input == "1")//ajouter un bateau
                         {
                             Bateau b = new Bateau();
@@ -424,10 +439,12 @@ namespace ConsoleApp1
                 } while (setupcount < 2);
                 state++;
 
+                JeuCommence();
+
                 do //Main Action loop
                 {
                     NextTurn();
-                    int tirRestant = 1;
+                    tirRestant = 1;
                     do // action Loop
                     {
                         
@@ -449,7 +466,7 @@ namespace ConsoleApp1
                     } while (tirRestant != 0 || valideInput == false);
                 } while (!Map1.EstFinie() && !Map2.EstFinie());
 
-
+                Victoire();
 
                 do // Exit Loop
                 {
