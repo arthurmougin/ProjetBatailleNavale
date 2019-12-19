@@ -54,10 +54,13 @@ namespace ConsoleApp1
         {
             int matriceTaille = matrice.GetLength(0);
 
+
             if (b.Horizontal)
             {
                 //Si le bateau ne sors pas de la map
-                if (b.Y + b.Taille-1 > (matriceTaille - 1))
+                if (b.Y < 0 || b.Y + b.Taille-1 > (matriceTaille - 1))
+                    return false;
+                if (b.X < 0 || b.X > (matriceTaille - 1))
                     return false;
 
                 //si son espace n'est pas occupé
@@ -77,9 +80,10 @@ namespace ConsoleApp1
             else
             {
                 //Si le bateau ne sors pas de la map
-                if (b.X + b.Taille-1 > (matriceTaille - 1))
+                if (b.X < 0 || b.X + b.Taille-1 > (matriceTaille - 1))
                     return false;
-
+                if (b.Y < 0 || b.Y > (matriceTaille - 1))
+                    return false;
 
                 //si son espace n'est pas occupé
                 for (uint i = b.X; i < (b.X + b.Taille); i++)

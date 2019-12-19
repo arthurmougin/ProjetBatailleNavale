@@ -127,25 +127,22 @@ namespace ConsoleApp1
         private string PrintInputs(int state)
         {
             string retour ="";
-            if(state == 0)
+            switch (state)
             {
-                retour = @"Mise en place :
-1: Ajouter un bateau
-2: Effacer
-3: Valider";
+                case 0:
+                    retour = "Mise en place :\n1: Ajouter un bateau\n2: Effacer\n3: Valider";
+                    break;
+                case 1:
+                    retour = "Jeu :\n1: Tirer\n2: Passer son tour";
+                    break;
+                case 2:
+                    retour = "Fin de partie :\n1: Recommencer\n2: Quitter";
+                    break;
+                default:
+                    break;
             }
-            else if (state == 1)
-            {
-                retour = @"Jeu :
-1: Tirer
-2: Passer son tour";
-            }
-            else if (state == 2)
-            {
-                retour = @"Fin de partie :
-1: Recommencer
-2: Quitter";
-            }
+
+
             return retour;
         }
 
@@ -191,15 +188,18 @@ namespace ConsoleApp1
                         {
                             x--;
 
-                            if (x < m.Matrice.GetLength(0))
+                            if (x > 0 && x < m.Matrice.GetLength(0))
                             {
                                 //test de la seconde valeur
-                                y = ((int)array[1].ToCharArray()[0]) - 97;
-                                if (y >= 0 && y < m.Matrice.GetLength(0))
+                                if(array[1].Length > 0)
                                 {
-                                    valideInput = true;
-                                    b.X = (uint)x;
-                                    b.Y = (uint)y;
+                                    y = ((int)array[1].ToCharArray()[0]) - 97;
+                                    if (y >= 0 && y < m.Matrice.GetLength(0))
+                                    {
+                                        valideInput = true;
+                                        b.X = (uint)x;
+                                        b.Y = (uint)y;
+                                    }
                                 }
                             }
                         }
@@ -325,11 +325,15 @@ namespace ConsoleApp1
                             if (x < GetMapEnemyByTurn().Matrice.GetLength(0))
                             {
                                 //test de la seconde valeur
-                                y = ((int)array[1].ToCharArray()[0]) - 97;
-                                if (y >= 0 && y < GetMapEnemyByTurn().Matrice.GetLength(0))
+                                if(array[1].Length > 0)
                                 {
-                                    valideInput = true;
+                                    y = ((int)array[1].ToCharArray()[0]) - 97;
+                                    if (y >= 0 && y < GetMapEnemyByTurn().Matrice.GetLength(0))
+                                    {
+                                        valideInput = true;
+                                    }
                                 }
+                                
                             }
                         }
                         
@@ -337,7 +341,7 @@ namespace ConsoleApp1
 
                     if (valideInput == false)
                     {
-                        AskUser("Valeur invalide (" + x + "-" + y + "), recommencez.");
+                        AskUser("Valeur invalide, recommencez.");
                     }
                 } while (!valideInput);
 
@@ -402,31 +406,29 @@ namespace ConsoleApp1
                         resetView();
                         valideInput = false;
                         input = AskUser(PrintInputs(0));
-                        
-
-                        if (input == "1")//ajouter un bateau
+                        switch (input)
                         {
-                            Bateau b = new Bateau();
-                            SetupBateau(b,GetMapByTurn());
-                            valideInput = true;
-                        }
-                        else if (input == "2")//effacer
-                        {
-                            GetMapByTurn().Reset();
-                            valideInput = true;
-                        }
-                        else if (input == "3")//valider
-                        {
-                            valideInput = true;
+                            case "1"://ajouter un bateau
+                                Bateau b = new Bateau();
+                                SetupBateau(b, GetMapByTurn());
+                                valideInput = true;
+                                break;
+                            case "2"://effacer
+                                GetMapByTurn().Reset();
+                                valideInput = true;
+                                break;
+                            case "3"://valider
+                                valideInput = true;
+                                break;
+                            default:
+                                break;
                         }
 
                         if (valideInput == false)
                         {
-                            
                             AskUser("Input inconnue, recommencez");
                         }
                             
-                       
                         if(input == "3" && GetMapByTurn().Bateaux.Count == 0)
                         {
                             valideInput = false;
@@ -451,19 +453,26 @@ namespace ConsoleApp1
                         resetView();
                         valideInput = false;
                         input = AskUser(PrintInputs(1));
-                        if (input == "1")
+                        switch (input)
                         {
-                            tirRestant = Tirer();
-                            valideInput = true;
-                        }
-                        if (input == "2")
-                        {
-                            valideInput = true;
+                            case "1"://tirer
+                                tirRestant = Tirer();
+                                valideInput = true;
+                                break;
+                            case "2"://passer son tour
+                                valideInput = true;
+                                tirRestant = 0;
+                                break;
+                            default:
+                                break;
                         }
 
                         if (valideInput == false)
                             AskUser("Input inconnue, recommencez");
+
+                        //Si on a encore des tirs, on peut recommencer
                     } while (tirRestant != 0 || valideInput == false);
+                    //Ceci chacun son tour jusqu'à ce que l'une des deux cartes soit vide
                 } while (!Map1.EstFinie() && !Map2.EstFinie());
 
                 Victoire();
@@ -473,16 +482,18 @@ namespace ConsoleApp1
                     resetView();
                     valideInput = false;
                     input = AskUser(PrintInputs(2));
-                    if (input == "1")//recommencer
+                    switch (input)
                     {
-                        state = 0;
-                        valideInput = true;
-
-                    }
-                    else if (input == "2")//finir
-                    {
-                        state = 2;
-                        valideInput = true;
+                        case "1":
+                            state = 0;
+                            valideInput = true;
+                            break;
+                        case "2":
+                            state = 2;
+                            valideInput = true;
+                            break;
+                        default:
+                            break;
                     }
 
                     if (valideInput == false)
