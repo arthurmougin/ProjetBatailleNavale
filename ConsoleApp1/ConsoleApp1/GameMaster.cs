@@ -188,10 +188,10 @@ namespace ConsoleApp1
                         {
                             x--;
 
-                            if (x > 0 && x < m.Matrice.GetLength(0))
+                            if (x >= 0 && x < m.Matrice.GetLength(0))
                             {
                                 //test de la seconde valeur
-                                if(array[1].Length > 0)
+                                if (array[1].Length > 0)
                                 {
                                     y = ((int)array[1].ToCharArray()[0]) - 97;
                                     if (y >= 0 && y < m.Matrice.GetLength(0))
@@ -322,7 +322,7 @@ namespace ConsoleApp1
                         {
                             x--;
 
-                            if (x < GetMapEnemyByTurn().Matrice.GetLength(0))
+                            if ( x >= 0 &&  x < GetMapEnemyByTurn().Matrice.GetLength(0))
                             {
                                 //test de la seconde valeur
                                 if(array[1].Length > 0)
