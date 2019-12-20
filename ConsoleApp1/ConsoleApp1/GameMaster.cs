@@ -150,7 +150,7 @@ namespace ConsoleApp1
         /// Retourne la map joueur
         /// </summary>
         /// <returns></returns>
-        private Carte GetMapByTurn()
+        private Carte GetPlayerMap()
         {
             return (tour % 2 == 0) ? map2 : map1;
         }
@@ -159,7 +159,7 @@ namespace ConsoleApp1
         /// Retourne la carte enemy
         /// </summary>
         /// <returns></returns>
-        private Carte GetMapEnemyByTurn()
+        private Carte GetEnemyMap()
         {
             return (tour % 2 == 0) ? map1 : map2;
         }
@@ -209,12 +209,21 @@ namespace ConsoleApp1
         }
 
         /// <summary>
+        /// Efface la fenetre et réaffiche la carte
+        /// </summary>
+        public void resetView()
+        {
+            Console.Clear();
+            Console.WriteLine(DrawMaps());
+        }
+
+        /// <summary>
         /// Structuration du code :
         /// Cette fonction gère l'ajout des bateaux dans une carte
         /// </summary>
         /// <param name="b"></param>
         /// <param name="m"></param>
-        public void SetupBateau(Bateau b,Carte m)
+        public void Setup(Bateau b,Carte m)
         {
             bool ValideBoat = false, valideInput = false, exit = false;
             string input = "";
@@ -328,14 +337,6 @@ namespace ConsoleApp1
             } while (!exit);
         }
 
-        /// <summary>
-        /// Efface la fenetre et réaffiche la carte
-        /// </summary>
-        public void resetView()
-        {
-            Console.Clear();
-            Console.WriteLine(DrawMaps());
-        }
 
         /// <summary>
         /// Structuration du code :
@@ -360,7 +361,7 @@ namespace ConsoleApp1
                     valideInput = false;
                     input = AskUser("Quelles sont les coordonnées de votre tir?\n(format: '1-a')");
 
-                    if (TestCoords(input, GetMapEnemyByTurn()))
+                    if (TestCoords(input, GetEnemyMap()))
                     {
                         array = input.Split('-', StringSplitOptions.None);
 
@@ -377,7 +378,7 @@ namespace ConsoleApp1
                     }
                 } while (!valideInput);
 
-                resultat = GetMapEnemyByTurn().Tirer(x, y);
+                resultat = GetEnemyMap().Tirer(x, y);
                 exit = true;
                 switch (resultat)
                 {
@@ -394,7 +395,7 @@ namespace ConsoleApp1
                         break;
                     case 3:
                         AskUser("Couler");
-                        retour = (GetMapEnemyByTurn().EstFinie())?0:1;
+                        retour = (GetEnemyMap().EstFinie())?0:1;
                         break;
                     default:
                         break;
@@ -450,7 +451,7 @@ namespace ConsoleApp1
 
             do //GameLoop
             {
-
+                //Choix de taille
                 do
                 {
                     int size;
@@ -469,8 +470,8 @@ namespace ConsoleApp1
 
                 setupcount = 0;
 
-
-                do //setupLoop
+                //setupLoop
+                do 
                 {
                     NextTurn();
                     do // Bateau loop
@@ -482,11 +483,11 @@ namespace ConsoleApp1
                         {
                             case "1"://ajouter un bateau
                                 Bateau b = new Bateau();
-                                SetupBateau(b, GetMapByTurn());
+                                Setup(b, GetPlayerMap());
                                 valideInput = true;
                                 break;
                             case "2"://effacer
-                                GetMapByTurn().Reset();
+                                GetPlayerMap().Reset();
                                 valideInput = true;
                                 break;
                             case "3"://valider
@@ -501,7 +502,7 @@ namespace ConsoleApp1
                             AskUser("Input inconnue, recommencez");
                         }
                             
-                        if(input == "3" && GetMapByTurn().Bateaux.Count == 0)
+                        if(input == "3" && GetPlayerMap().Bateaux.Count == 0)
                         {
                             valideInput = false;
                             AskUser("Vous avez besoin d'au moins 1 bateau pour valider votre setup.\nAppuyez nimporte ou pour continuer.");
@@ -516,7 +517,8 @@ namespace ConsoleApp1
 
                 JeuCommence();
 
-                do //Main Action loop
+                //Main Action loop
+                do
                 {
                     NextTurn();
                     tirRestant = 1;
@@ -526,6 +528,7 @@ namespace ConsoleApp1
                         resetView();
                         valideInput = false;
                         input = AskUser(PrintInputs(1));
+                        tirRestant--;
                         switch (input)
                         {
                             case "1"://tirer
@@ -534,7 +537,6 @@ namespace ConsoleApp1
                                 break;
                             case "2"://passer son tour
                                 valideInput = true;
-                                tirRestant = 0;
                                 break;
                             default:
                                 break;
@@ -544,13 +546,14 @@ namespace ConsoleApp1
                             AskUser("Input inconnue, recommencez");
 
                         //Si on a encore des tirs, on peut recommencer
-                    } while (tirRestant != 0 || valideInput == false);
+                    } while (tirRestant > 0 || valideInput == false);
                     //Ceci chacun son tour jusqu'à ce que l'une des deux cartes soit vide
                 } while (!Map1.EstFinie() && !Map2.EstFinie());
 
                 Victoire();
 
-                do // Exit Loop
+                // Exit Loop
+                do
                 {
                     resetView();
                     valideInput = false;

@@ -154,6 +154,7 @@ namespace ConsoleApp1
         {
             return "'-':vide, 'H':bateau, 'v':raté, 'X':touché, 'O':coulé\n\n\n";
         }
+
         public void Reset()
         {
             bateaux.Clear();
@@ -166,6 +167,7 @@ namespace ConsoleApp1
                 }
             }
         }
+
         public Bateau GetBateauByCoords(int x, int y)
         {
             if(Matrice[x,y] == '-' || Matrice[x, y] == 'v')

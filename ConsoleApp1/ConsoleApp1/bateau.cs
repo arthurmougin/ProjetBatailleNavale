@@ -72,11 +72,6 @@ namespace ConsoleApp1
             this.vies = taille;
         }
 
-        public bool isAlive()
-        {
-            return vies > 0;
-        }
-
         public override string ToString()
         {
             return "Bateau positionné en " + (x+1) + "-" + (char)(y + 96 +1)+ ", de longueur "+ taille + " et "+((horizontal)?"horizontal":"vertical");
