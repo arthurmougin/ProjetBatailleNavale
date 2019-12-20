@@ -8,7 +8,6 @@ namespace ConsoleApp1
         {
 
             GameMaster GM = new GameMaster();
-
             GM.Jeu();
 
         }

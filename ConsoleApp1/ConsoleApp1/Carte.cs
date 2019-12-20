@@ -50,6 +50,11 @@ namespace ConsoleApp1
             Bateaux = new List<Bateau>();
         }
 
+        /// <summary>
+        /// Essaie d'ajouter le bateau mis en paramêtre. S'il y arrive, retourne Vrai, sinon Faux
+        /// </summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public bool AddBateau(Bateau b)
         {
             int matriceTaille = matrice.GetLength(0);
@@ -103,6 +108,11 @@ namespace ConsoleApp1
             return true;
         }
 
+        /// <summary>
+        /// Génère automatiquement un affichage complet de la carte en chaine de caractères
+        /// </summary>
+        /// <param name="caché"></param>
+        /// <returns></returns>
         public string ToString(bool caché)
         {
             int matriceTaille = matrice.GetLength(0),marker;
@@ -141,6 +151,12 @@ namespace ConsoleApp1
             return retour;
         }
 
+        /// <summary>
+        /// Retourne une ligne specifique de toString sur demande
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="caché"></param>
+        /// <returns></returns>
         public string GetLine(int line,bool caché)
         {
             string retour,input = this.ToString(caché);
@@ -150,11 +166,18 @@ namespace ConsoleApp1
             
         }
 
+        /// <summary>
+        /// Retourne une chaine de caractères décrivant les symboles de la matrice
+        /// </summary>
+        /// <returns></returns>
         public string GetDoc()
         {
             return "'-':vide, 'H':bateau, 'v':raté, 'X':touché, 'O':coulé\n\n\n";
         }
 
+        /// <summary>
+        /// Efface la carte et la liste de bateaux
+        /// </summary>
         public void Reset()
         {
             bateaux.Clear();
@@ -168,6 +191,12 @@ namespace ConsoleApp1
             }
         }
 
+        /// <summary>
+        /// Retourne le bateau présent aux coordonnées souhaitées
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public Bateau GetBateauByCoords(int x, int y)
         {
             if(Matrice[x,y] == '-' || Matrice[x, y] == 'v')
@@ -190,6 +219,10 @@ namespace ConsoleApp1
             return null;
         }
 
+        /// <summary>
+        /// Retourne un booléen indiquant si cette carte n'a plus de bateaux en vie
+        /// </summary>
+        /// <returns></returns>
         public bool EstFinie()
         {
             int viesRestantes = 0;
@@ -200,6 +233,10 @@ namespace ConsoleApp1
             return viesRestantes == 0;
         }
 
+        /// <summary>
+        /// Fonction utilisée en interne pour remplacer les bateaux coulés par le marqueur adapté
+        /// </summary>
+        /// <param name="b"></param>
         private void BateauCoulé(Bateau b)
         {
             if (b.Horizontal)
@@ -221,6 +258,12 @@ namespace ConsoleApp1
             }
         }
 
+        /// <summary>
+        /// Gère le tir sur la matrice et retourne un indicateur de ce qui s'est passé
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public int Tirer(int x,int y)
         {
             int retour = 0;//0:raté, 1:déjàtiré, 2:touché, 3:couler

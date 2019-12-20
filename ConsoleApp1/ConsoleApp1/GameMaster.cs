@@ -42,7 +42,6 @@ namespace ConsoleApp1
             set { tour = value; }
         }
 
-
         public GameMaster()
         {
             int mapSize = 5;
@@ -438,6 +437,9 @@ namespace ConsoleApp1
             Console.Clear();
         }
 
+        /// <summary>
+        /// Boucle principale de jeu
+        /// </summary>
         public void Jeu()
         {
 
