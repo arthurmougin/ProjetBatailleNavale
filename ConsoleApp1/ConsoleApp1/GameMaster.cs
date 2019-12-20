@@ -63,9 +63,13 @@ namespace ConsoleApp1
 
         }
 
+        /// <summary>
+        /// Dessin de la partie supperieur de la fenetre
+        /// </summary>
+        /// <returns></returns>
         private string DrawMaps()
         {
-
+            //Les inputs
             string retour = Map1.GetDoc();
             bool j1playing = (tour % 2 == 0) ?true:false;
             
@@ -112,18 +116,11 @@ namespace ConsoleApp1
             return retour;
         }
 
-        private void NextTurn()
-        {
-            Console.Clear();
-            if (tour == 0)
-                Console.WriteLine(@"Nouvelle partie!");
-            tour += 1;
-            int player = (tour + 1)%2+1;
-          
-            AskUser("\n\n\nJoueur " + player + ", à votre tour.\nAppuyez sur entrer pour continuer.");
-            Console.Clear();
-        }
-
+        /// <summary>
+        /// Le catalogue d'inputs en fonction des besoins
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
         private string PrintInputs(int state)
         {
             string retour ="";
@@ -138,6 +135,9 @@ namespace ConsoleApp1
                 case 2:
                     retour = "Fin de partie :\n1: Recommencer\n2: Quitter";
                     break;
+                case 3:
+                    retour = "Initial Setup :\nEntrez la largeur de la carte (la longueur sera identique)\nLa valeur doit etre comprise entre 5 et 26";
+                    break;
                 default:
                     break;
             }
@@ -146,63 +146,100 @@ namespace ConsoleApp1
             return retour;
         }
 
+        /// <summary>
+        /// Retourne la map joueur
+        /// </summary>
+        /// <returns></returns>
         private Carte GetMapByTurn()
         {
             return (tour % 2 == 0) ? map2 : map1;
         }
        
+        /// <summary>
+        /// Retourne la carte enemy
+        /// </summary>
+        /// <returns></returns>
         private Carte GetMapEnemyByTurn()
         {
             return (tour % 2 == 0) ? map1 : map2;
         }
         
-
+        /// <summary>
+        /// Fonction qui permet de demander à l'utilisateur de rentrer quelque chose après lui avoir affiché un message.
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
         private string AskUser(string content)
         {
             Console.WriteLine(content);
             return Console.ReadLine();
         }
         
+        /// <summary>
+        /// Validations des coordonnées rentrées par l'utilisateur
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="carte"></param>
+        /// <returns></returns>
+        private bool TestCoords(string input, Carte m)
+        {
+            int x = 0,y = 0;
+            string[] array = input.Split('-', StringSplitOptions.None);
+            if (array.Length >= 2)
+            {
+                //test de la première valeur
+                if (Int32.TryParse(array[0], out x))
+                {
+
+                    if (x > 0 && x <= m.Matrice.GetLength(0))
+                    {
+                        //test de la seconde valeur
+                        if (array[1].Length > 0)
+                        {
+                            y = ((int)array[1].ToCharArray()[0]) - 97;
+                            if (y >= 0 && y < m.Matrice.GetLength(0))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Structuration du code :
+        /// Cette fonction gère l'ajout des bateaux dans une carte
+        /// </summary>
+        /// <param name="b"></param>
+        /// <param name="m"></param>
         public void SetupBateau(Bateau b,Carte m)
         {
             bool ValideBoat = false, valideInput = false, exit = false;
             string input = "";
+            string[] array;
+            int x = 0, y = 0;
             do
             {
                 resetView();
                 Console.WriteLine(@"Création d'un bateau:");
-
+                
 
                 //coordonnées
                 do
                 {
                     valideInput = false;
                     input = AskUser("Quelles sont les coordonnées de son point haut-Gauche?\n(format: '1-a')");
-                    string[] array = input.Split('-', StringSplitOptions.None);
-                    int x = 0,y = 0;
-
-                    if(array.Length >= 2)
+                   
+                    if (TestCoords(input, m))
                     {
-                        //test de la première valeur
-                        if (Int32.TryParse(array[0], out x))
-                        {
-                            x--;
-
-                            if (x >= 0 && x < m.Matrice.GetLength(0))
-                            {
-                                //test de la seconde valeur
-                                if (array[1].Length > 0)
-                                {
-                                    y = ((int)array[1].ToCharArray()[0]) - 97;
-                                    if (y >= 0 && y < m.Matrice.GetLength(0))
-                                    {
-                                        valideInput = true;
-                                        b.X = (uint)x;
-                                        b.Y = (uint)y;
-                                    }
-                                }
-                            }
-                        }
+                        array = input.Split('-', StringSplitOptions.None);
+                        Int32.TryParse(array[0], out x);
+                        y = ((int)array[1].ToCharArray()[0]) - 96;
+                        b.X = ((uint)x)-1;
+                        b.Y = ((uint)y)-1;
+                        valideInput = true;
                     }
                     
                     if (valideInput == false)
@@ -291,17 +328,26 @@ namespace ConsoleApp1
             } while (!exit);
         }
 
+        /// <summary>
+        /// Efface la fenetre et réaffiche la carte
+        /// </summary>
         public void resetView()
         {
             Console.Clear();
             Console.WriteLine(DrawMaps());
         }
 
+        /// <summary>
+        /// Structuration du code :
+        /// Cette fonction gère le tir et retourne le nombre de tir restants
+        /// </summary>
+        /// <returns></returns>
         public int Tirer()
         {
             bool ValideFire = false, valideInput = false, exit = false;
             string input = "";
             int retour = 0;
+            string[] array;
             int x = 0, y = 0,resultat = 0;
             do
             {
@@ -313,32 +359,18 @@ namespace ConsoleApp1
                 {
                     valideInput = false;
                     input = AskUser("Quelles sont les coordonnées de votre tir?\n(format: '1-a')");
-                    string[] array = input.Split('-', StringSplitOptions.None);
-                    
-                    if(array.Length >= 2)
+
+                    if (TestCoords(input, GetMapEnemyByTurn()))
                     {
-                        //test de la première valeur
-                        if (Int32.TryParse(array[0], out x))
-                        {
-                            x--;
+                        array = input.Split('-', StringSplitOptions.None);
 
-                            if ( x >= 0 &&  x < GetMapEnemyByTurn().Matrice.GetLength(0))
-                            {
-                                //test de la seconde valeur
-                                if(array[1].Length > 0)
-                                {
-                                    y = ((int)array[1].ToCharArray()[0]) - 97;
-                                    if (y >= 0 && y < GetMapEnemyByTurn().Matrice.GetLength(0))
-                                    {
-                                        valideInput = true;
-                                    }
-                                }
-                                
-                            }
-                        }
-                        
+                        Int32.TryParse(array[0], out x);
+                        y = ((int)array[1].ToCharArray()[0]) - 96;
+                        x--;
+                        y--;
+                        valideInput = true;
                     }
-
+                    
                     if (valideInput == false)
                     {
                         AskUser("Valeur invalide, recommencez.");
@@ -372,16 +404,37 @@ namespace ConsoleApp1
             return retour;
         }
 
+        /// <summary>
+        /// Annonce de debut de jeu
+        /// </summary>
         public void JeuCommence()
         {
             Console.Clear();
             AskUser("\n\n\nLes jeux commencent !");
         }
 
+        /// <summary>
+        /// Annonce de fin de jeu
+        /// </summary>
         public void Victoire()
         {
             Console.Clear();
             AskUser("\n\n\nLe joueur " + (map1.EstFinie()?"2":"1") + " a gagné!");
+        }
+
+        /// <summary>
+        /// Annonce de changement de joueur et incrément du tour
+        /// </summary>
+        private void NextTurn()
+        {
+            Console.Clear();
+            if (tour == 0)
+                Console.WriteLine(@"Nouvelle partie!");
+            tour += 1;
+            int player = (tour + 1) % 2 + 1;
+
+            AskUser("\n\n\nJoueur " + player + ", à votre tour.\nAppuyez sur entrer pour continuer.");
+            Console.Clear();
         }
 
         public void Jeu()
@@ -392,12 +445,31 @@ namespace ConsoleApp1
             string input = "";
             bool valideInput = false;
             int setupcount, tirRestant;
-
+            
 
 
             do //GameLoop
             {
+
+                do
+                {
+                    int size;
+                    valideInput = false;
+                    input = AskUser(PrintInputs(3));
+                    if(Int32.TryParse(input, out size))
+                    {
+                        valideInput = true;
+                        size -= 5;
+                        if (size < 0) size = 0;
+                        int mapSize = size % 22 + 5;
+                        map1 = new Carte(mapSize);
+                        map2 = new Carte(mapSize);
+                    }
+                } while (valideInput == false);
+
                 setupcount = 0;
+
+
                 do //setupLoop
                 {
                     NextTurn();
@@ -440,6 +512,7 @@ namespace ConsoleApp1
                     setupcount++;
                 } while (setupcount < 2);
                 state++;
+
 
                 JeuCommence();
 
